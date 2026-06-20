@@ -1,7 +1,7 @@
 import os
 
 from flask import (
-    Blueprint, render_template, abort, send_from_directory, current_app,
+    Blueprint, render_template, abort, send_file, current_app,
 )
 
 from app.models.provider import Provider
@@ -12,10 +12,23 @@ from app.models.review import Review
 website_bp = Blueprint('website', __name__, template_folder='../templates/website')
 
 
+def _apk_file():
+    """Absolute path to the servable APK, or None.
+
+    Prefers the explicit APK_PATH; otherwise DOWNLOAD_FOLDER/APK_FILENAME.
+    """
+    path = current_app.config.get('APK_PATH')
+    if path and os.path.exists(path):
+        return path
+    fallback = os.path.join(
+        current_app.config['DOWNLOAD_FOLDER'], current_app.config['APK_FILENAME']
+    )
+    return fallback if os.path.exists(fallback) else None
+
+
 def apk_available():
-    """True if the APK has been placed on the server."""
-    folder = current_app.config['DOWNLOAD_FOLDER']
-    return os.path.exists(os.path.join(folder, current_app.config['APK_FILENAME']))
+    """True if a downloadable APK is present on the server."""
+    return _apk_file() is not None
 
 
 @website_bp.app_context_processor
@@ -30,13 +43,13 @@ def inject_download_flags():
 
 @website_bp.route('/download/app')
 def download_app():
-    folder = current_app.config['DOWNLOAD_FOLDER']
-    filename = current_app.config['APK_FILENAME']
-    if not os.path.exists(os.path.join(folder, filename)):
+    apk = _apk_file()
+    if not apk:
         abort(404, description='App build not uploaded yet. '
-                               'Place the APK at backend/downloads/.')
-    return send_from_directory(
-        folder, filename, as_attachment=True, download_name='SlotCut.apk',
+                               'Place the APK at backend/downloads/ or set APK_PATH.')
+    version = current_app.config.get('APP_VERSION', '1.0')
+    return send_file(
+        apk, as_attachment=True, download_name=f'SlotCut-v{version}.apk',
     )
 
 

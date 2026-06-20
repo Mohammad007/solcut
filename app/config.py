@@ -52,6 +52,14 @@ class Config:
     DOWNLOAD_FOLDER = os.getenv('DOWNLOAD_FOLDER', os.path.join(BASE_DIR, 'downloads'))
     APK_FILENAME = os.getenv('APK_FILENAME', 'SlotCut.apk')
     APP_VERSION = os.getenv('APP_VERSION', '1.0')
+    # Optional direct path to a specific APK (takes priority over DOWNLOAD_FOLDER).
+    # Relative paths are resolved against backend/. e.g. uploads/Slotcut v0.1.apk
+    _apk_path = os.getenv('APK_PATH', '')
+    APK_PATH = (
+        _apk_path
+        if not _apk_path or os.path.isabs(_apk_path)
+        else os.path.join(BASE_DIR, _apk_path)
+    )
 
     # Admin panel
     ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'admin')
