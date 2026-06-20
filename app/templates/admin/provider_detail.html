@@ -1,0 +1,35 @@
+{% extends 'admin/layout.html' %}
+{% block title %}{{ p.shop_name }}{% endblock %}
+{% block content %}
+<a href="{{ url_for('admin.providers') }}" class="btn btn-sm btn-link mb-2">&larr; Back</a>
+<div class="row g-3">
+  <div class="col-md-8">
+    <div class="card shadow-sm"><div class="card-body">
+      <h4>{{ p.shop_name or '(incomplete profile)' }}
+        <span class="badge bg-secondary">{{ p.shop_type }}</span></h4>
+      <p class="text-muted mb-1">Owner: {{ p.owner_name }} · {{ p.phone }}</p>
+      <p class="mb-1">{{ p.address_line }}, {{ p.mohalla }}, {{ p.city }}, {{ p.state }} {{ p.pincode }}</p>
+      <p class="mb-1">Hours: {{ p.open_time }}–{{ p.close_time }} · <i class="bi bi-star-fill text-warning"></i> {{ '%.1f'|format(p.rating or 0) }} ({{ p.rating_count }})</p>
+      <p class="mb-1">Total bookings: {{ p.total_bookings }} · Home visit: {{ 'Yes' if p.is_home_visit else 'No' }}</p>
+      <p>{{ p.description or '' }}</p>
+    </div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm"><div class="card-body">
+      <h6>Admin Actions</h6>
+      <form method="post" action="{{ url_for('admin.verify_provider', provider_id=p.id) }}" class="mb-2">
+        <button class="btn w-100 {{ 'btn-outline-danger' if p.is_verified else 'btn-success' }}">
+          {{ 'Revoke Verification' if p.is_verified else 'Verify Provider' }}
+        </button>
+      </form>
+      <form method="post" action="{{ url_for('admin.premium_provider', provider_id=p.id) }}">
+        <div class="input-group">
+          <input name="days" type="number" value="30" class="form-control" min="1">
+          <button class="btn btn-info">Grant Premium (days)</button>
+        </div>
+        {% if p.is_premium %}<small class="text-muted">Expires: {{ p.premium_expiry }}</small>{% endif %}
+      </form>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

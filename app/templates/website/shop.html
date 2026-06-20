@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ p.shop_name }} — {{ p.city }} | SlotCut</title>
+  <meta name="description" content="{{ p.shop_name }} in {{ p.mohalla }}, {{ p.city }}. {{ p.shop_type|capitalize }} · {{ '%.1f'|format(p.rating or 0) }}/5 rating. Book or join the live queue on SlotCut.">
+  <meta property="og:title" content="{{ p.shop_name }} — SlotCut">
+  <meta property="og:description" content="{{ p.shop_type|capitalize }} in {{ p.mohalla }}, {{ p.city }} · {{ '%.1f'|format(p.rating or 0) }}/5 rating">
+  {% if p.cover_image_url %}<meta property="og:image" content="{{ p.cover_image_url }}">{% endif %}
+  <meta name="theme-color" content="#FF6B35">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root{--o:#FF6B35;--o-dark:#E8551F;--g:#2D6A4F;--ink:#15110E;--muted:#6B6B6B;--bg:#FAFAF8;--cream:#FFF4EE;--line:#EFE7E1}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Poppins',system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+    a{text-decoration:none;color:inherit}
+    .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+    .topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+    .brand{font-weight:800;color:var(--o);font-size:1.25rem;display:flex;gap:.4rem;align-items:center}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;border:none;cursor:pointer;padding:.7rem 1.3rem;border-radius:999px;font-weight:600;font-family:inherit;transition:.25s}
+    .btn-primary{background:var(--o);color:#fff;box-shadow:0 14px 34px -16px rgba(232,85,31,.6)}
+    .btn-primary:hover{background:var(--o-dark);transform:translateY(-2px)}
+    .cover{height:300px;background:linear-gradient(135deg,#FFE3D5,#FFC9B0) center/cover no-repeat;position:relative}
+    .cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.45))}
+    .head{margin-top:-70px;position:relative;z-index:2}
+    .head-card{background:#fff;border-radius:24px;box-shadow:0 30px 60px -34px rgba(0,0,0,.4);padding:26px 28px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:flex-start}
+    .badge-pill{display:inline-flex;align-items:center;gap:.4rem;background:var(--cream);color:var(--o-dark);padding:.3rem .8rem;border-radius:999px;font-size:.8rem;font-weight:600}
+    h1{font-size:clamp(1.6rem,4vw,2.2rem);font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:.5rem}
+    .meta{color:var(--muted);margin-top:6px;font-size:.95rem}
+    .live{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+    .dot{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .8rem;border-radius:999px;font-size:.82rem;font-weight:600}
+    .open{background:rgba(45,106,79,.12);color:var(--g)}
+    .closed{background:rgba(230,57,70,.12);color:#E63946}
+    .qbadge{background:#FFF3CD;color:#8a6d00}
+    .grid{display:grid;grid-template-columns:1.6fr 1fr;gap:30px;margin:40px 0 70px}
+    @media(max-width:840px){.grid{grid-template-columns:1fr}}
+    h2.sec{font-size:1.3rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:.5rem}
+    .svc{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 18px;margin-bottom:10px;transition:.2s}
+    .svc:hover{border-color:var(--o);transform:translateX(4px)}
+    .svc .price{font-weight:800;color:var(--o)}
+    .team{display:flex;gap:18px;flex-wrap:wrap}
+    .member{text-align:center;width:80px}
+    .ava{width:70px;height:70px;border-radius:50%;background:var(--cream) center/cover;display:flex;align-items:center;justify-content:center;color:var(--o);font-size:1.5rem;margin:0 auto 6px;border:2px solid #fff;box-shadow:0 8px 20px -12px rgba(0,0,0,.4)}
+    .review{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:10px}
+    .review .who{font-weight:600}
+    .reveal{opacity:0;transform:translateY(26px)}
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="wrap">
+      <a href="{{ url_for('website.index') }}" class="brand"><i class="bi bi-scissors"></i> SlotCut</a>
+      <a href="#" class="btn btn-primary"><i class="bi bi-phone"></i> Book on App</a>
+    </div>
+  </div>
+
+  <div class="cover" {% if p.cover_image_url %}style="background-image:url('{{ p.cover_image_url }}')"{% endif %}></div>
+
+  <div class="wrap head">
+    <div class="head-card reveal">
+      <div>
+        {% set icons = {'BARBER':'bi-scissors','SALOON':'bi-shop','PARLOUR':'bi-flower2','UNISEX':'bi-gender-ambiguous'} %}
+        <span class="badge-pill">
+          <i class="bi {{ icons.get(p.shop_type, 'bi-shop') }}"></i> {{ p.shop_type|capitalize }}
+        </span>
+        <h1 style="margin-top:8px">{{ p.shop_name }}
+          {% if p.is_verified %}<i class="bi bi-patch-check-fill" style="color:var(--o);font-size:1.2rem" title="Verified"></i>{% endif %}
+        </h1>
+        <div class="meta"><i class="bi bi-star-fill" style="color:#FFB400"></i> {{ '%.1f'|format(p.rating or 0) }} ({{ p.rating_count }} reviews) &nbsp;·&nbsp; <i class="bi bi-clock"></i> {{ p.open_time }}–{{ p.close_time }}</div>
+        <div class="meta"><i class="bi bi-geo-alt-fill" style="color:var(--o)"></i> {{ p.address_line }}, {{ p.mohalla }}, {{ p.city }}</div>
+        <div class="live">
+          <span id="statusBadge" class="dot {{ 'open' if p.is_open else 'closed' }}"><i class="bi bi-circle-fill" style="font-size:.55rem"></i> {{ 'Open Now' if p.is_open else 'Closed' }}</span>
+          <span id="queueBadge" class="dot qbadge" style="display:none"></span>
+        </div>
+      </div>
+      <a href="#" class="btn btn-primary" style="white-space:nowrap"><i class="bi bi-calendar-check"></i> Book / Join Queue</a>
+    </div>
+  </div>
+
+  <div class="wrap grid">
+    <div>
+      <section class="reveal">
+        <h2 class="sec"><i class="bi bi-scissors" style="color:var(--o)"></i> Services</h2>
+        {% for s in services %}
+        <div class="svc">
+          <div>
+            <div style="font-weight:600">{{ s.name }}{% if s.name_hindi %} <span class="muted" style="font-size:.85rem">({{ s.name_hindi }})</span>{% endif %}</div>
+            <div class="muted" style="font-size:.82rem">~{{ s.duration_min }} min{% if s.category %} · {{ s.category|capitalize }}{% endif %}</div>
+          </div>
+          <div class="price">₹{{ s.price }}</div>
+        </div>
+        {% else %}<p class="muted">No services listed.</p>{% endfor %}
+      </section>
+
+      <section class="reveal" style="margin-top:36px">
+        <h2 class="sec"><i class="bi bi-people-fill" style="color:var(--o)"></i> Team</h2>
+        <div class="team">
+          {% for b in barbers %}
+          <div class="member">
+            <div class="ava" {% if b.photo_url %}style="background-image:url('{{ b.photo_url }}')"{% endif %}>{% if not b.photo_url %}<i class="bi bi-person"></i>{% endif %}</div>
+            <div style="font-size:.85rem;font-weight:600">{{ b.name }}</div>
+          </div>
+          {% else %}<p class="muted">No team members listed.</p>{% endfor %}
+        </div>
+      </section>
+    </div>
+
+    <aside>
+      <section class="reveal">
+        <h2 class="sec"><i class="bi bi-chat-square-heart-fill" style="color:var(--o)"></i> Reviews</h2>
+        {% for r in reviews %}
+        <div class="review">
+          <div class="who">{{ r.user_name }} <span style="color:#FFB400">{{ '★' * r.rating }}</span></div>
+          {% if r.comment %}<p class="muted" style="font-size:.9rem;margin-top:4px">{{ r.comment }}</p>{% endif %}
+        </div>
+        {% else %}<p class="muted">No reviews yet.</p>{% endfor %}
+      </section>
+    </aside>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script>
+    if (window.gsap) {
+      gsap.utils.toArray('.reveal').forEach((el,i)=>gsap.to(el,{opacity:1,y:0,duration:.7,delay:i*.06,ease:'power3.out'}));
+    } else { document.querySelectorAll('.reveal').forEach(e=>{e.style.opacity=1;e.style.transform='none'}); }
+
+    async function refresh(){
+      try{
+        const r = await fetch('/api/v1/providers/{{ p.id }}/queue-status');
+        const j = await r.json(); const q = j.data;
+        const b = document.getElementById('queueBadge');
+        if(q && q.waiting_count > 0){
+          b.style.display='inline-flex';
+          b.innerHTML = '<i class="bi bi-people-fill"></i> '+q.waiting_count+' in queue · ~'+q.estimated_wait+' min';
+        } else { b.style.display='none'; }
+      }catch(e){}
+    }
+    refresh(); setInterval(refresh, 15000);
+  </script>
+</body>
+</html>

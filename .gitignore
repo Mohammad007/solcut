@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Env & secrets
+.env
+firebase-credentials.json
+
+# Database
+instance/
+*.db
+*.sqlite3
+
+# Uploads (keep folder structure, ignore content)
+uploads/**/*
+!uploads/**/.gitkeep
+
+# App build binaries (keep README, ignore the APK/IPA)
+downloads/*.apk
+downloads/*.aab
+downloads/*.ipa
+
+# Migrations versions are committed; the rest is fine
+# (keep migrations/ tracked)
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

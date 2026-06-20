@@ -1,0 +1,22 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Revenue{% endblock %}
+{% block content %}
+<h3 class="mb-3">Revenue — Last 30 Days</h3>
+<div class="card shadow-sm mb-3"><div class="card-body">
+  <div class="num" style="font-size:2rem; font-weight:700; color:#06d6a0;">₹{{ '%.2f'|format(total) }}</div>
+  <div class="text-muted">Total (successful payments, 30 days)</div>
+</div></div>
+<div class="card shadow-sm"><div class="card-body">
+  <canvas id="revChart" height="90"></canvas>
+</div></div>
+{% endblock %}
+{% block scripts %}
+<script>
+  new Chart(document.getElementById('revChart'), {
+    type: 'bar',
+    data: { labels: {{ chart_labels|tojson }},
+      datasets: [{ label: '₹', data: {{ chart_values|tojson }}, backgroundColor: '#FF6B35' }] },
+    options: { plugins: { legend: { display: false } } }
+  });
+</script>
+{% endblock %}

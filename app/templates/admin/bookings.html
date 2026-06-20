@@ -1,0 +1,35 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Bookings{% endblock %}
+{% block content %}
+<h3 class="mb-3">Bookings</h3>
+<form class="row g-2 mb-3">
+  <div class="col-auto">
+    <select name="status" class="form-select">
+      <option value="">All statuses</option>
+      {% for s in ['PENDING','CONFIRMED','IN_PROGRESS','COMPLETED','CANCELLED','NO_SHOW'] %}
+      <option value="{{ s }}" {{ 'selected' if request.args.get('status')==s }}>{{ s }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-auto"><button class="btn btn-dark">Filter</button></div>
+</form>
+<div class="card shadow-sm"><div class="card-body table-responsive">
+<table class="table table-hover align-middle">
+  <thead><tr><th>Booking No</th><th>Type</th><th>Amount</th><th>Status</th><th>Paid</th><th>Created</th></tr></thead>
+  <tbody>
+    {% for b in bookings %}
+    <tr>
+      <td>{{ b.booking_no }}</td>
+      <td>{{ b.booking_type }}</td>
+      <td>₹{{ b.total_amount }}</td>
+      <td><span class="badge bg-secondary">{{ b.status }}</span></td>
+      <td>{% if b.is_paid %}<i class="bi bi-check-circle-fill text-success"></i>{% else %}<span class="text-muted">—</span>{% endif %}</td>
+      <td>{{ b.created_at.strftime('%d %b %H:%M') if b.created_at }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" class="text-center text-muted">No bookings yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div></div>
+{% endblock %}

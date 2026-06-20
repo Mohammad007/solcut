@@ -1,0 +1,46 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h3 class="mb-4">Dashboard</h3>
+<div class="row g-3 mb-4">
+  {% set cards = [
+    ('Total Providers', stats.total_providers, 'bi-shop', '#FF6B35'),
+    ('Verified', stats.verified_providers, 'bi-patch-check', '#2D6A4F'),
+    ('Customers', stats.total_users, 'bi-people', '#3a86ff'),
+    ("Today's Bookings", stats.today_bookings, 'bi-calendar-check', '#8338ec'),
+    ("Today's Revenue (₹)", stats.today_revenue, 'bi-cash', '#06d6a0'),
+    ('Active Queues', stats.active_queues, 'bi-list-ol', '#ef476f'),
+    ('Month Revenue (₹)', stats.month_revenue, 'bi-graph-up', '#118ab2'),
+  ] %}
+  {% for label, value, icon, color in cards %}
+  <div class="col-md-3 col-sm-6">
+    <div class="card stat-card shadow-sm h-100">
+      <div class="card-body">
+        <i class="bi {{ icon }}" style="font-size:1.6rem; color:{{ color }};"></i>
+        <div class="num">{{ value }}</div>
+        <div class="text-muted small">{{ label }}</div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+<div class="card shadow-sm">
+  <div class="card-body">
+    <h6 class="mb-3">Revenue — Last 7 Days</h6>
+    <canvas id="revChart" height="80"></canvas>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  new Chart(document.getElementById('revChart'), {
+    type: 'line',
+    data: {
+      labels: {{ chart_labels|tojson }},
+      datasets: [{ label: '₹ Revenue', data: {{ chart_values|tojson }},
+        borderColor: '#FF6B35', backgroundColor: 'rgba(255,107,53,.15)', fill: true, tension: .3 }]
+    },
+    options: { plugins: { legend: { display: false } } }
+  });
+</script>
+{% endblock %}

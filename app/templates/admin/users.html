@@ -1,0 +1,23 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Customers{% endblock %}
+{% block content %}
+<h3 class="mb-3">Customers</h3>
+<div class="card shadow-sm"><div class="card-body table-responsive">
+<table class="table table-hover align-middle">
+  <thead><tr><th>Name</th><th>Phone</th><th>City</th><th>Lang</th><th>Joined</th></tr></thead>
+  <tbody>
+    {% for u in users %}
+    <tr>
+      <td>{{ u.name or '—' }}</td>
+      <td>{{ u.phone }}</td>
+      <td>{{ u.city or '—' }}</td>
+      <td>{{ u.preferred_lang }}</td>
+      <td>{{ u.created_at.strftime('%d %b %Y') if u.created_at }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5" class="text-center text-muted">No customers yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div></div>
+{% endblock %}

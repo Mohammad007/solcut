@@ -1,0 +1,40 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Providers{% endblock %}
+{% block content %}
+<h3 class="mb-3">Providers</h3>
+<form class="row g-2 mb-3">
+  <div class="col-auto"><input name="city" class="form-control" placeholder="City" value="{{ request.args.get('city','') }}"></div>
+  <div class="col-auto">
+    <select name="type" class="form-select">
+      <option value="">All types</option>
+      {% for t in ['BARBER','SALOON','PARLOUR','UNISEX'] %}
+      <option value="{{ t }}" {{ 'selected' if request.args.get('type')==t }}>{{ t }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-auto"><button class="btn btn-dark">Filter</button></div>
+</form>
+<div class="card shadow-sm"><div class="card-body table-responsive">
+<table class="table table-hover align-middle">
+  <thead><tr><th>Shop</th><th>Type</th><th>City</th><th>Phone</th><th>Rating</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    {% for p in providers %}
+    <tr>
+      <td><strong>{{ p.shop_name or '(incomplete)' }}</strong><br><small class="text-muted">{{ p.owner_name }}</small></td>
+      <td><span class="badge bg-secondary">{{ p.shop_type }}</span></td>
+      <td>{{ p.city }}</td>
+      <td>{{ p.phone }}</td>
+      <td><i class="bi bi-star-fill text-warning"></i> {{ '%.1f'|format(p.rating or 0) }}</td>
+      <td>
+        {% if p.is_verified %}<span class="badge bg-success">Verified</span>{% else %}<span class="badge bg-warning text-dark">Unverified</span>{% endif %}
+        {% if p.is_premium %}<span class="badge bg-info">Premium</span>{% endif %}
+      </td>
+      <td><a href="{{ url_for('admin.provider_detail', provider_id=p.id) }}" class="btn btn-sm btn-outline-dark">View</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7" class="text-center text-muted">No providers yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div></div>
+{% endblock %}
